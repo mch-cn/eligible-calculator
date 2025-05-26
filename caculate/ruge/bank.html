@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>有效户计算器</title>
+    <meta charset="UTF-8">
+    <!-- 添加viewport适配移动端 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        /* 适配微信字体 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', STHeiti, 'Microsoft Yahei', Tahoma, Simsun, sans-serif;
+            padding: 15px;
+            -webkit-text-size-adjust: 100% !important;
+            background: #f8f8f8;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 15px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+        }
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        button:active {
+            background: #0056b3;
+            transform: scale(0.98);
+        }
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .highlight {
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        /* 隐藏日期控件的日历图标（微信环境可能需要） */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            display: none;
+            -webkit-appearance: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 容器内容保持不变 -->
+    <div class="container">
+        <!-- ...原有内容... -->
+    </div>
+
+    <script>
+        // 在脚本开始添加微信环境检测
+        window.onload = function() {
+            const isWeixin = /micromessenger/i.test(navigator.userAgent);
+            if (isWeixin) {
+                document.body.style.fontFamily = "PingFang SC, sans-serif";
+            }
+        }
+
+        function calculate() {
+            // 修改日期处理逻辑适配移动端
+            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            
+            // 获取输入值时添加移动端校验
+            const targetDate = document.getElementById('targetDate').value;
+            const currentDate = document.getElementById('currentDate').value;
+            
+            // 其他计算逻辑保持不变，但建议添加数字格式化
+            const formatNumber = num => num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            
+            // ...原有计算逻辑...
+            
+            // 结果展示添加移动端适配
+            document.getElementById('result').innerHTML = `
+                <strong>需要补充的金额：</strong><span class="highlight">${formatNumber(requiredAmount)}</span> 元<br>
+                <strong>建议补充金额：</strong><span class="highlight">${suggestedAmount.toLocaleString()}</span> 元<br>
+                <small>计算逻辑：目标天数（${targetDays}天）× 100,000元<br>
+                - 当前日均 × 当前天数 / 剩余天数（${remainingDays}天）<br>
+                - 当前余额</small>
+            `;
+        }
+    </script>
+</body>
+</html>

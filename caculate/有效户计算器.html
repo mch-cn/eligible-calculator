@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>有效户计算器</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px; }
+        .highlight { color: #dc3545; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>有效户计算器</h2>
+        <div class="input-group">
+            <label>目标日期:</label>
+            <input type="date" id="targetDate" required>
+        </div>
+        <div class="input-group">
+            <label>当前日期（您查看的报表数据统计日期）:</label>
+            <input type="date" id="currentDate" required>
+        </div>
+        <div class="input-group">
+            <label>当前金融总量年日均（元）:</label>
+            <input type="number" id="dailyAvg" step="0.01" required>
+        </div>
+        <div class="input-group">
+            <label>当前金融总量余额（元）:</label>
+            <input type="number" id="currentBalance" step="0.01" required>
+        </div>
+        <button onclick="calculate()">计算</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function calculate() {
+            // 获取输入值
+            const targetDate = new Date(document.getElementById('targetDate').value);
+            const currentDate = new Date(document.getElementById('currentDate').value);
+            const dailyAvg = parseFloat(document.getElementById('dailyAvg').value);
+            const currentBalance = parseFloat(document.getElementById('currentBalance').value);
+
+            // 计算目标天数和当前天数
+            const getDaysInYear = (date) => {
+                const year = date.getFullYear();
+                const start = new Date(year, 0, 1);
+                const diff = date - start;
+                return Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
+            };
+
+            const targetDays = getDaysInYear(targetDate);
+            const currentDays = getDaysInYear(currentDate);
+            const remainingDays = targetDays - currentDays;
+
+            // 检查剩余天数是否有效
+            if (remainingDays <= 0) {
+                document.getElementById('result').innerHTML = "错误：当前日期不能晚于或等于目标日期。";
+                return;
+            }
+
+            // 计算公式
+            const targetDaily = 100000;
+            const numerator = (targetDays * targetDaily) - (dailyAvg * currentDays);
+            const requiredDaily = numerator / remainingDays;
+            const requiredAmount = requiredDaily - currentBalance;
+
+            // 计算建议补充金额（以万向上取整）
+            const suggestedAmount = Math.ceil(requiredAmount / 10000) * 10000;
+
+            // 显示结果
+            document.getElementById('result').innerHTML = `
+                <strong>需要补充的金额：</strong><span class="highlight">${requiredAmount.toFixed(2)}</span> 元<br>
+                <strong>建议补充金额：</strong><span class="highlight">${suggestedAmount.toLocaleString()}</span> 元<br>
+                <small>计算逻辑：目标天数（${targetDays}天）× 100,000元 - 当前日均 × 当前天数 / 剩余天数（${remainingDays}天） - 当前余额</small>
+            `;
+        }
+    </script>
+</body>
+</html>
